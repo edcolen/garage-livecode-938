@@ -4,14 +4,31 @@ export default class extends Controller {
     static targets = ["carsList"];
 
     connect() {
-        this.garageName = "awesome-garage-name";
+        this.garageName = "garage938";
         this.garageUrl = `https://wagon-garage-api.herokuapp.com/${this.garageName}/cars`;
+        this.fetchCars();
+    }
+
+    fetchCars() {
         fetch(this.garageUrl)
             .then((response) => response.json())
             .then((data) => {
                 this.carsListTarget.innerHTML = "";
-                data.forEach((car) => this._insertCarCard(car));
+                data.forEach((car) => this.insertCarCard(car));
             });
+    }
+
+    createCar(event) {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const body = Object.fromEntries(formData);
+        fetch(this.garageUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        }).then(this.fetchCars());
+
+        event.currentTarget.reset();
     }
 
     insertCarCard(car) {
